@@ -33,7 +33,7 @@ class Tank:
         # both are used to generate a new angle for the gun/arm (using arctan)
         global appx_frames_to_dest
         
-        self.angle = atan2(mouse_y, mouse_x)
+        self.angle = math.atan2(mouse_y, mouse_x)
         
         x_distance = mouse_x - self.x
         y_distance = mouse_y - self.y
@@ -56,7 +56,7 @@ class Tank:
     def rotate_point(origin, point, angle):
         point_at_origin = (point_x - origin_x, point_y - origin_y)
 
-        rotated_point = (point_at_origin[0] * math.cosine(angle) - point_at_origin[1] * math.sine(angle), point_at_origin[0] * math.sine(angle) + point_at_origin[1] * math.cosine(angle))
+        rotated_point = (point_at_origin[0] * math.cos(angle) - point_at_origin[1] * math.sin(angle), point_at_origin[0] * math.sin(angle) + point_at_origin[1] * math.cos(angle))
 
         new_point = (rotated_point[0] + origin[0], rotated_point[1] + origin[1])
         return new_point
