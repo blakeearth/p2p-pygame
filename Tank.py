@@ -3,64 +3,78 @@ import random
 import math
 import Bullet
 
+
 class Tank:
     """The class used to represent both players' tanks in-game"""
     appx_frames_to_dest = 30
 
-    def __init__(self, left, max_y=100):
+    def __init__(self, left, surface_width, max_y=100):
         self.left = left
         self.max_y = max_y
-        self.x = 0
+        self.surface_width = surface_width
         self.y = random.randint(0, max_y)
-        self.angle = math.pi / 4
+
+        if left:  # gives the tank a random staring x position on its side of the screen
+            self.angle = -math.pi / 4
+            self.x = random.randint(0, self.surface_width / 4)
+        else:
+            self.angle = (-math.pi * 3) / 4
+            self.x = random.randint(3 * (self.surface_width / 4), self.surface_width)
 
         self.color = 81, 122, 81
         self.width = 100
         self.height = 50
 
-
     def change_location(self):
         self.y = random.randint(0, self.max_y)
+
+        if self.left:  # gives the tank a random staring x position on its side of the screen
+            self.angle = -math.pi / 4
+            self.x = random.randint(0, self.surface_width / 4)
+        else:
+            self.angle = (-math.pi * 3) / 4
+            self.x = random.randint(3 * (self.surface_width / 4), self.surface_width)
 
     def get_y(self):
         # to be used to send new ys to peers (or after new tank)
         return self.y
 
+    def get_x(self):  # used for checking collision and sending new xs to peers
+        return self.x
 
-    def shoot(self, mouse_X, mouse_y):
+    def get_width(self):  # used for checking collision
+        return self.width
+
+    def get_height(self):  # used for checking collision
+        return self.height
+
+    def shoot(self, mouse):
         # x is used to construct x-velocity of bullet
         # y is used to construct y-velocity of bullet
         # both are used to generate a new angle for the gun/arm (using arctan)
-        global appx_frames_to_dest
-        
-        self.angle = math.atan2(mouse_y, mouse_x)
-        
-        x_distance = mouse_x - self.x
-        y_distance = mouse_y - self.y
-        
-        x_vel = (1 / appx_frames_to_dest) * x_distance
-        y_vel = (1 / appx_frames_to_dest) * y_distance
+        angle_x = mouse[0] - self.x
+        angle_y = mouse[1] - self.y
+        self.angle = math.atan2(angle_y, angle_x)
+
+        x_vel = mouse[0] - self.x
+        y_vel = self.y - mouse[1]
 
         # note: this will likely *not* come out of the arm yet
-        return Bullet(self.x, self.y, x_vel, y_vel)
-
+        return Bullet.Bullet(self.x, self.y, x_vel, y_vel)
 
     def set_angle(self, angle):
         self.angle = angle
 
-
     def get_angle(self):
         return self.angle
 
-
-    def rotate_point(origin, point, angle):
-        point_at_origin = (point_x - origin_x, point_y - origin_y)
+    def rotate_point(self, origin, point, angle):
+        point_at_origin = (point[0] - origin[0], point[1] - origin[1])
 
         rotated_point = (point_at_origin[0] * math.cos(angle) - point_at_origin[1] * math.sin(angle), point_at_origin[0] * math.sin(angle) + point_at_origin[1] * math.cos(angle))
 
         new_point = (rotated_point[0] + origin[0], rotated_point[1] + origin[1])
         return new_point
-
 
     def draw(self, surface):
         # draw the tank arm - rectangles are aligned with axes, so must be a polygon]
@@ -79,7 +93,7 @@ class Tank:
         r4 = self.rotate_point(arm_origin, v4, self.angle)
         
         pygame.draw.polygon(surface, self.color, [r1, r2, r3, r4])
-        
+
         # draw the tank body
-        body = pygame.Rect(self.x - width / 2, self.x - height / 2, self.x + width / 2, self.x + height / 2)
+        body = pygame.Rect(self.x - (self.width / 2), self.y, self.width, self.height)
         pygame.draw.rect(surface, self.color, body)

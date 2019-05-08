@@ -1,38 +1,50 @@
+import pygame
+
+
 class Bullet:
+    color = (255, 0, 0)
     gravity = -9.8
+    radius = 10
 
     def __init__(self, x, y, xVol, yVol):
         self.x = x
         self.y = y
         self.yStart = self.y
-        self.xVolocity = xVol
-        self.yVolocity = yVol
-        self.yInitialVol = self.yVolocity
+        self.xVelocity = xVol
+        self.yVelocity = yVol
+        self.yInitialVol = self.yVelocity
         self.time = 0
 
     def update(self):
-        global gravity
 
-        self.time += 1
+        self.time += 0.1  # increment the time for calculations
 
-        newX = self.x + self.xVolocity
-        newVol = self.yInitialVol + (gravity * self.time)
+        newX = self.x + (self.xVelocity / 10)  # calculate the new x cord
+        newVol = self.yInitialVol + (self.gravity * self.time)  # calculate the new y velocity
 
-        newY = self.yStart + ((1/2) * (self.yInitialVol + newVol) * self.time)
+        newY = self.yStart + (-((1/2) * (self.yInitialVol + newVol) * self.time))  # calculate new y cord
 
-        self.x = newX
-        self.y = newY
+        self.x = int(newX)  # update x and y cords and yVelocity
+        self.y = int(newY)
+        self.yVelocity = newVol
 
-    def getx(self):
+    def get_x(self):
         return self.x
 
-    def gety(self):
+    def get_y(self):
         return self.y
 
-    def getxVol(self):
-        return self.xVolocity
+    def get_radius(self):
+        return self.radius
 
-    def getyVol(self):
+    def getx_vel(self):
+        return self.xVelocity
+
+    def gety_vel(self):
         return self.yVelocity
+
+    def draw(self, surface):
+        pygame.draw.circle(surface, self.color, (self.x, self.y), self.radius, 0)
+        return
 
 
