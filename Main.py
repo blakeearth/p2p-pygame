@@ -2,7 +2,7 @@ import pygame
 import thorpy # GUI library designed for pygame http://www.thorpy.org/documentation/userguide/cheatsheet.html
 import sys
 import Tank
-import Bullet
+import Mastermind
 
 from pygame.locals import *
 
@@ -25,7 +25,9 @@ def main():
     DISPLAYSURFACE = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption('P2P Demonstration')
     FPSCLOCK = pygame.time.Clock()
-    
+
+    # TODO mastermind server setup
+
     draw_start_screen()
 
 
@@ -36,6 +38,7 @@ def submit_ip(event):
 
 def connect(ip):
     # TODO: validate that it's either "localhost" or a valid IP address; state = "connect" and connect if it is
+    #  mastermind client setup
     print(ip)
     run_game()
     return
@@ -75,16 +78,23 @@ def draw_start_screen():
 
 
 def run_game():
+    # TODO computers flip a coin to see who is going first and who si on the left side of the screen
+    roll_win = True
+    my_turn = roll_win
     while True: # game loop
-        player_1 = Tank.Tank(True, 1200, 700)
-        player_2 = Tank.Tank(False, 1200, 700)
+        player_1 = Tank.Tank(roll_win, 1200, 700)
+        player_2 = Tank.Tank(~roll_win, 1200, 700)
         bullet_1 = None
+        # TODO send and receive x and y cords
         while True:  # runs for one "turn"
             for event in pygame.event.get():  # event handling loop
                 if event.type == QUIT:
                     terminate()
-                elif event.type == MOUSEBUTTONDOWN:  # if the player clicks on the screen shoot a bullet
+                elif event.type == MOUSEBUTTONDOWN and my_turn and bullet_1 == None:  # if the player clicks on the screen shoot a bullet
                     bullet_1 = player_1.shoot(pygame.mouse.get_pos())
+                    # TODO send message with bullet info
+
+            # TODO message handling stuff
 
             DISPLAYSURFACE.fill(background_color)
 
@@ -93,6 +103,7 @@ def run_game():
                 bullet_1.draw(DISPLAYSURFACE)
 
                 if collision(player_2, bullet_1):
+                    # TODO send message saying that you are hit
                     break
 
                 if bullet_1.get_x() < 0 or bullet_1.get_x() > WINDOWWIDTH:
@@ -106,6 +117,7 @@ def run_game():
 
 
 def terminate():
+    # TODO disconnect
     pygame.quit()
     sys.exit()
 
