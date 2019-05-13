@@ -35,6 +35,10 @@ class Tank:
             self.angle = (-math.pi * 3) / 4
             self.x = random.randint(3 * (self.surface_width / 4), self.surface_width)
 
+    def set_location(self, x, y):
+        self.x = x
+        self.y = y
+
     def get_y(self):
         # to be used to send new ys to peers (or after new tank)
         return self.y
