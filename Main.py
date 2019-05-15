@@ -1,11 +1,13 @@
 import pygame
-import thorpy # GUI library designed for pygame http://www.thorpy.org/documentation/userguide/cheatsheet.html
-import sys
-import Tank
-import Mastermind
-import Server
-
 from pygame.locals import *
+import thorpy # GUI library designed for pygame http://www.thorpy.org/documentation/userguide/cheatsheet.html
+import Mastermind
+
+import random
+import sys
+
+import Tank
+import Server
 
 background_color = (0, 0, 255)
 
@@ -116,8 +118,18 @@ def draw_start_screen():
 
 
 def run_game():
-    # TODO computers flip a coin to see who is going first and who is on the left side of the screen
-    roll_win = False
+    # computers flip a coin to see who is going first and who is on the left side of the screen
+    our_roll = random.randrange(1, 6)
+    their_roll = our_roll
+    roll_message = {"type": "roll", "number": our_roll}
+    client.send(roll_message)
+    while our_roll == their_roll:
+        if server.has_roll():
+            their_roll = server.get_roll()
+            if our_roll == their_roll:
+                client.send(roll_message)
+    
+    roll_win = our_roll > their_roll
     my_turn = roll_win
     while True: # game loop
         player_1 = Tank.Tank(roll_win, 1200, 700)

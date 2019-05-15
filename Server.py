@@ -13,9 +13,9 @@ class Server(MastermindServerCallbacksDebug, MastermindServerTCP):
             
             self.reader = MessageReader()
             
-            self.has_bullet = False
-            self.has_roll = False
-            self.has_coord = False
+            self.new_bullet = False
+            self.new_roll = False
+            self.new_coord = False
 
             self.bullet = None
             self.coord = None
@@ -25,13 +25,13 @@ class Server(MastermindServerCallbacksDebug, MastermindServerTCP):
         def callback_client_handle(self, connection_object, data):
             message_type = self.reader.message_type(data)
             if message_type == "shoot":
-                self.has_bullet = True
+                self.new_bullet = True
                 self.bullet = self.reader.read_shoot(data)
             elif message_type == "cord":
-                self.has_coord = True
+                self.new_coord = True
                 self.coord = self.reader.read_cord(data)
             elif message_type == "roll":
-                self.has_roll = True
+                self.new_roll = True
                 self.roll = self.reader.read_roll(data)
             
 
@@ -41,15 +41,15 @@ class Server(MastermindServerCallbacksDebug, MastermindServerTCP):
 
 
         def has_bullet(self):
-            return self.has_bullet
+            return self.new_bullet
 
 
         def has_roll(self):
-            return self.has_roll
+            return self.new_roll
 
 
         def has_coord(self):
-            return self.has_coord
+            return self.new_coord
 
         def get_bullet(self):
             return self.bullet
