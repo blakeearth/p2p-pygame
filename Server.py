@@ -49,7 +49,7 @@ class Server(MastermindServerCallbacksDebug, MastermindServerTCP):
             return self.new_roll
 
 
-        def has_coord(self):
+        def has_coords(self):
             return self.new_coord
 
         def get_bullet(self):
@@ -62,6 +62,6 @@ class Server(MastermindServerCallbacksDebug, MastermindServerTCP):
             return self.roll
 
 
-        def get_coord(self):
+        def get_coords(self):
             self.new_coord = False
             return self.coord

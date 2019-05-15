@@ -149,7 +149,7 @@ def run_game():
         their_cords = 0
 
         while True:
-            if server.has_coord() == True:
+            if server.has_coords() == True:
                 their_cords = server.get_coords()
                 break
 
