@@ -102,7 +102,7 @@ def draw_start_screen():
 
     # peer information box
 
-    peer_ip_field = thorpy.Inserter(name="Peer's IP", value="localhost", size=(100, 12))
+    peer_ip_field = thorpy.Inserter(name="Peer's IP", value="localhost", size=(150, 12))
 
     peer_port_field = thorpy.Inserter(name="Peer's Host Port", value="23867", size=(100, 12))
 
@@ -121,6 +121,7 @@ def draw_start_screen():
 
 
 def run_game():
+    global player_2_score, player_1_score
     # computers flip a coin to see who is going first and who is on the left side of the screen
     our_roll = random.randrange(1, 6)
     their_roll = our_roll
@@ -143,15 +144,36 @@ def run_game():
         player_2 = Tank.Tank(~roll_win, 1200, 700)
         bullet_1 = None
         # TODO send and receive x and y cords
+        cord_message = {"type": "cord", "x": player_1.get_x(), "y": player_1.get_y()}
+        client.send(cord_message)
+        their_cords = 0
+
+        while True:
+            if server.has_coord() == True:
+                their_cords = server.get_coords()
+                break
+
+        player_2.set_location(their_cords[0], their_cords[1])
+
         while True:  # runs for one "turn"
             for event in pygame.event.get():  # event handling loop
                 if event.type == QUIT:
                     terminate()
                 elif event.type == MOUSEBUTTONDOWN and my_turn and bullet_1 == None:  # if the player clicks on the screen shoot a bullet
                     bullet_1 = player_1.shoot(pygame.mouse.get_pos())
-                    # TODO send message with bullet info
+                    my_turn = False
+                    # send message with bullet info
+                    shoot_message = {"type": "shoot", "x": bullet_1.get_x(), "y": bullet_1.get_y(), "x_vol": bullet_1.getx_vel(), "y_vol": bullet_1.gety_vel()}
+                    client.send(shoot_message)
 
             # TODO message handling stuff
+            if server.has_bullet() == True:
+                bullet_1 = server.get_bullet()
+                my_turn = True
+
+            if server.has_coords() == True:
+                player_1_score += 1
+                break
 
             DISPLAYSURFACE.fill(background_color)
 
@@ -159,8 +181,9 @@ def run_game():
                 bullet_1.update()
                 bullet_1.draw(DISPLAYSURFACE)
 
-                if collision(player_2, bullet_1):
-                    # TODO send message saying that you are hit
+                if collision(player_1, bullet_1) and my_turn == True:
+                    # send message saying that you are hit
+                    player_2_score += 1
                     break
 
                 if bullet_1.get_x() < 0 or bullet_1.get_x() > WINDOWWIDTH:
@@ -175,6 +198,10 @@ def run_game():
 
 def terminate():
     # TODO disconnect
+    client.disconect()
+    server.disconect_client()
+    server.disconect()
+
     pygame.quit()
     sys.exit()
 

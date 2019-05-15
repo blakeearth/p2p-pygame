@@ -1,6 +1,5 @@
 from Mastermind import *
 
-import threading
 from time import gmtime, strftime
 
 from MessageReader import MessageReader
@@ -43,26 +42,26 @@ class Server(MastermindServerCallbacksDebug, MastermindServerTCP):
 
 
         def has_bullet(self):
-            self.new_bullet = False
             return self.new_bullet
 
 
         def has_roll(self):
-            self.new_roll = False
             return self.new_roll
 
 
         def has_coord(self):
-            self.new_coord = False
             return self.new_coord
 
         def get_bullet(self):
+            self.new_bullet = False
             return self.bullet
 
 
         def get_roll(self):
+            self.new_roll = False
             return self.roll
 
 
         def get_coord(self):
+            self.new_coord = False
             return self.coord
