@@ -128,6 +128,7 @@ def run_game():
     roll_message = {"type": "roll", "number": our_roll}
     client.send(roll_message)
     while True:
+        print(1)
         if server.has_roll():
             their_roll = server.get_roll()
             if our_roll == their_roll:
@@ -149,6 +150,7 @@ def run_game():
         their_cords = 0
 
         while True:
+            print(2)
             if server.has_coords() == True:
                 their_cords = server.get_coords()
                 break
