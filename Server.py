@@ -3,7 +3,6 @@ from Mastermind import *
 from time import gmtime, strftime
 
 from MessageReader import MessageReader
-from Bullet import Bullet
 
 
 class Server(MastermindServerCallbacksDebug, MastermindServerTCP):

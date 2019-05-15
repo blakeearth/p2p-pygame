@@ -39,6 +39,9 @@ class Tank:
         self.x = x
         self.y = y
 
+    def left_or_right(self):
+        return self.left
+
     def get_y(self):
         # to be used to send new ys to peers (or after new tank)
         return self.y

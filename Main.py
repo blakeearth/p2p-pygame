@@ -128,7 +128,6 @@ def run_game():
     roll_message = {"type": "roll", "number": our_roll}
     client.send(roll_message)
     while True:
-        print(1)
         if server.has_roll():
             their_roll = server.get_roll()
             if our_roll == their_roll:
@@ -150,7 +149,6 @@ def run_game():
         their_cords = 0
 
         while True:
-            print(2)
             if server.has_coords() == True:
                 their_cords = server.get_coords()
                 break
@@ -191,7 +189,7 @@ def run_game():
                 if bullet_1.get_x() < 0 or bullet_1.get_x() > WINDOWWIDTH:
                     bullet_1 = None  # if the bullet is off screen remove it
 
-            print_score()  # draw players and score
+            print_score(player_1.left_or_right())  # draw players and score
             player_1.draw(DISPLAYSURFACE)
             player_2.draw(DISPLAYSURFACE)
             pygame.display.update()
@@ -208,7 +206,19 @@ def terminate():
     sys.exit()
 
 
-def print_score():
+def print_score(player_1_side):
+    global player_1_score, player_2_score
+    font_obj = pygame.font.Font('freesansbold.ttf', 16)
+
+    if player_1_side == True:
+        text_surface_obj = font_obj.render("player 1 score: " + player_1_score + "| player 2 score" + player_2_score, True, (255, 255, 255))
+    else:
+        text_surface_obj = font_obj.render("player 2 score: " + player_2_score + "| player 1 score" + player_1_score, True, (255, 255, 255))
+
+    text_rect_obj = text_surface_obj.get_rect()
+    text_rect_obj.center = (WINDOWWIDTH / 2, 30)
+
+    DISPLAYSURFACE.blit(text_surface_obj, text_rect_obj)
     pass
 
 
