@@ -26,6 +26,7 @@ client = None
 player_1_score = 0
 player_2_score = 0
 
+
 def main():
     global DISPLAYSURFACE, FPSCLOCK
 
@@ -41,6 +42,7 @@ def main():
 def submit_ip(event):
     value = event.el.get_value()
     connect(value)
+
 
 def submit_server(port_field):
     global server_port, server
@@ -68,6 +70,7 @@ def submit_peer(ip_field, port_field):
     ip = client_ip
     port = client_port
     connect(ip, port)
+
 
 def connect(ip, port):
     # TODO: validate that it's either "localhost" or a valid IP address; state = "connect" and connect if it is
@@ -123,11 +126,15 @@ def run_game():
     their_roll = our_roll
     roll_message = {"type": "roll", "number": our_roll}
     client.send(roll_message)
-    while our_roll == their_roll:
+    while True:
         if server.has_roll():
             their_roll = server.get_roll()
             if our_roll == their_roll:
+                our_roll = random.randrange(1, 6)
+                roll_message["number"] = our_roll
                 client.send(roll_message)
+            else:
+                break
     
     roll_win = our_roll > their_roll
     my_turn = roll_win

@@ -1,5 +1,6 @@
 import Bullet
 
+
 class MessageReader:
 
     def __init__(self):

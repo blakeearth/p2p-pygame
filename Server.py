@@ -6,7 +6,9 @@ from time import gmtime, strftime
 from MessageReader import MessageReader
 from Bullet import Bullet
 
+
 class Server(MastermindServerCallbacksDebug, MastermindServerTCP):
+
         def __init__(self):
             MastermindServerTCP.__init__(self, 0.5,0.5,60.0)
             #self.mutex = threading.Lock()
