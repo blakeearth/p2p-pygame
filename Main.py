@@ -3,6 +3,7 @@ import thorpy # GUI library designed for pygame http://www.thorpy.org/documentat
 import sys
 import Tank
 import Mastermind
+import Server
 
 from pygame.locals import *
 
@@ -13,6 +14,12 @@ WINDOWHEIGHT = 700
 DISPLAYSURFACE = ""
 
 fps = 30
+
+server_port = 0
+client_port = 0
+
+server = None
+client = None
 
 player_1_score = 0
 player_2_score = 0
@@ -26,8 +33,6 @@ def main():
     pygame.display.set_caption('P2P Demonstration')
     FPSCLOCK = pygame.time.Clock()
 
-    # TODO mastermind server setup
-
     draw_start_screen()
 
 
@@ -35,51 +40,84 @@ def submit_ip(event):
     value = event.el.get_value()
     connect(value)
 
+def submit_server(port_field):
+    global server_port, server
 
-def connect(ip):
+    port = port_field.get_value()
+    
+    print("Starting a server on localhost with port " + port)
+    server_port = int(float(port))
+
+    server = Server.Server()
+    server.connect("localhost", server_port)
+    try:
+        server.accepting_allow()
+    except:
+        # From example: only way to break is with an exception
+        pass
+
+
+def submit_peer(ip_field, port_field):
+    global client_port
+
+    client_port = int(float(port_field.get_value()))
+    client_ip = ip_field.get_value()
+    
+    ip = client_ip
+    port = client_port
+    connect(ip, port)
+
+def connect(ip, port):
     # TODO: validate that it's either "localhost" or a valid IP address; state = "connect" and connect if it is
     #  mastermind client setup
+
+    global client_port, client
+    
     print(ip)
+    client = Mastermind.MastermindClientTCP(5.0, 10.0)
+    client.connect(ip, client_port)
+    
     run_game()
     return
 
 
 def draw_start_screen():
-    global DISPLAYSURFACE, WINDOWWIDTH, WINDOWHEIGHT
+    global DISPLAYSURFACE, WINDOWWIDTH, WINDOWHEIGHT, server_port
 
-    ip_field = thorpy.Inserter(name="Peer's IP", value="localhost", size=(100, 12))
-    
-    # can't figure out how to make a submit button! currently handling this with the submit reaction below
-    # needs user to press enter/return
-    cancel_button = thorpy.make_button("Cancel", func=terminate)
-    
-    box = thorpy.Box(elements=[ip_field, cancel_button])
+    server_port_field = thorpy.Inserter(name="My Host Port", value="23865", size=(100, 12))
 
-    submit_reaction = thorpy.Reaction(reacts_to=thorpy.constants.THORPY_EVENT,
-                              reac_func=submit_ip,
-                              event_args={"id":thorpy.constants.EVENT_INSERT})
+    submit_server_button = thorpy.make_button("Submit", func=submit_server,
+                                                   params={"port_field":server_port_field})
     
-    box.add_reaction(submit_reaction)
-    box.set_topleft((WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 25)) # position the box
-    box.blit() # draw the box's pixels so we don't need to update them individually for them to draw properly
-    box.update()
+    server_box = thorpy.Box(elements=[server_port_field, submit_server_button])
+    
+    server_box.set_topleft((WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 25)) # position the box
+    server_box.blit() # draw the box's pixels so we don't need to update them individually for them to draw properly
+    server_box.update()
 
-    menu = thorpy.Menu(box)
+    # peer information box
+
+    peer_ip_field = thorpy.Inserter(name="Peer's IP", value="localhost", size=(100, 12))
+
+    peer_port_field = thorpy.Inserter(name="Peer's Host Port", value="23867", size=(100, 12))
+
+    submit_peer_button = thorpy.make_button("Submit", func=submit_peer,
+                                                   params={"ip_field": peer_ip_field,
+                                                           "port_field": peer_port_field})
+
+    peer_box = thorpy.Box(elements=[peer_ip_field, peer_port_field, submit_peer_button])
+    peer_box.set_topleft((WINDOWWIDTH / 2 - 100, WINDOWHEIGHT / 2 - 50)) # position the box
+
+    thorpy.set_launcher(submit_server_button, peer_box)
+
+    menu = thorpy.Menu(server_box)
     menu.play()
-    for element in menu.get_population():
-        element.surface = DISPLAYSURFACE
-    while True:
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                terminate()
-            # respond to thorpy reactions
-            menu.react(event)
     return
 
 
 def run_game():
-    # TODO computers flip a coin to see who is going first and who si on the left side of the screen
-    roll_win = True
+    # TODO computers flip a coin to see who is going first and who is on the left side of the screen
+    roll_win = False
     my_turn = roll_win
     while True: # game loop
         player_1 = Tank.Tank(roll_win, 1200, 700)
