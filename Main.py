@@ -198,9 +198,9 @@ def run_game():
 
 def terminate():
     # TODO disconnect
-    client.disconect()
-    server.disconect_client()
-    server.disconect()
+    client.disconnect()
+    server.disconnect_clients()
+    server.disconnect()
 
     pygame.quit()
     sys.exit()
@@ -211,9 +211,9 @@ def print_score(player_1_side):
     font_obj = pygame.font.Font('freesansbold.ttf', 16)
 
     if player_1_side == True:
-        text_surface_obj = font_obj.render("player 1 score: " + player_1_score + "| player 2 score" + player_2_score, True, (255, 255, 255))
+        text_surface_obj = font_obj.render("player 1 score: " + str(player_1_score) + "| player 2 score" + str(player_2_score), True, (255, 255, 255))
     else:
-        text_surface_obj = font_obj.render("player 2 score: " + player_2_score + "| player 1 score" + player_1_score, True, (255, 255, 255))
+        text_surface_obj = font_obj.render("player 2 score: " + str(player_2_score) + "| player 1 score" + str(player_1_score), True, (255, 255, 255))
 
     text_rect_obj = text_surface_obj.get_rect()
     text_rect_obj.center = (WINDOWWIDTH / 2, 30)
